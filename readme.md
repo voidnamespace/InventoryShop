@@ -1,103 +1,86 @@
-
 # InventoryShop API
 
-API для управления товарами, заказами и пользователями магазина.
+API for managing store products, orders, and users.
 
-## Описание проекта
-**InventoryShop** — учебный проект на ASP.NET Core с использованием EF Core и JWT аутентификации.  
-Проект реализует CRUD для товаров, заказов и пользователей, поддерживает юнит-тесты и структуру для расширения функционала.
+## Project Description
+**InventoryShop** is a learning project built on ASP.NET Core using EF Core and JWT authentication.  
+The project implements CRUD operations for products, orders, and users, supports unit testing, and provides a structure for future feature expansion.
 
-## Структура проекта
+## Project Structure
 
-InventoryShop.sln          # Решение
-src/                       # Основной проект API
-tests/                     # Юнит-тесты
-.gitignore                  # Игнорируемые файлы
-README.md                  # Этот файл
+InventoryShop.sln # Solution file
+src/ # Main API project
+tests/ # Unit tests
+.gitignore # Ignored files
+README.md # This file
+
 
 ### src/
-- `InventoryShop.Api/` — проект Web API
-  - `Program.cs` — точка входа
-  - `appsettings.json` — настройки приложения
-  - `Properties/launchSettings.json` — настройки запуска
-  - `bin/` и `obj/` — автоматически создаются сборкой
-  - Сущности, DTO, контроллеры и сервисы проекта
+- `InventoryShop.Api/` — Web API project
+  - `Program.cs` — entry point
+  - `appsettings.json` — application settings
+  - `Properties/launchSettings.json` — launch configuration
+  - `bin/` and `obj/` — auto-generated build folders
+  - Project entities, DTOs, controllers, and services
 
 ### tests/
-- `InventoryShop.Tests/` — тесты
-  - Unit-тесты для сервисов и контроллеров
+- `InventoryShop.Tests/` — unit tests
+  - Unit tests for services and controllers
 
-## Стек технологий
+## Technology Stack
 - .NET 9
 - ASP.NET Core Web API
 - Entity Framework Core (SQLite)
-- JWT аутентификация
-- xUnit для тестирования
+- JWT Authentication
+- xUnit for testing
 - Git + GitHub
 
-## Как начать проект
+## Getting Started
 
-1. Клонировать репозиторий:
+1. Clone the repository:
 ```bash
 git clone <URL_REPO>
 cd InventoryShop
-```
+Build the project:
 
-2. Сборка проекта:
-```bash
+
 dotnet build
-```
+Run the API:
 
-3. Запуск API:
-```bash
+
 dotnet run --project src/InventoryShop.Api
-```
+Run tests:
 
-4. Запуск тестов:
-```bash
 dotnet test tests/InventoryShop.Tests
-```
+Step-by-Step Development Cheat Sheet
+Create the solution:
 
-## Пошаговая шпаргалка разработки
-
-1. Создать solution:
-```bash
 dotnet new sln -n InventoryShop
-```
+Create projects:
 
-2. Создать проекты:
-```bash
 dotnet new webapi -o src/InventoryShop.Api
 dotnet new xunit -o tests/InventoryShop.Tests
-```
+Add projects to the solution:
 
-3. Добавить проекты в solution:
-```bash
 dotnet sln add src/InventoryShop.Api/InventoryShop.Api.csproj
 dotnet sln add tests/InventoryShop.Tests/InventoryShop.Tests.csproj
-```
+Add a reference to the API project in tests:
 
-4. Подключить ссылку на API проект в тестах:
-```bash
 cd tests/InventoryShop.Tests
 dotnet add reference ../../src/InventoryShop.Api/InventoryShop.Api.csproj
-```
+Configure .gitignore for Visual Studio and C#
 
-5. Настроить `.gitignore` для Visual Studio и C#
+Create an empty Program.cs and set up DI, services, logging
 
-6. Создать пустой `Program.cs` и настроить DI, сервисы, логирование
+Create entities and tables using EF Core
 
-7. Создавать сущности и таблицы через EF Core
+Implement CRUD and HTTP endpoints
 
-8. Реализовать CRUD и HTTP методы
+Add unit tests in parallel
 
-9. Параллельно добавлять юнит-тесты
+Create feature branches for each feature and commit with meaningful messages
 
-10. Создавать ветки для каждой фичи и делать коммиты с осмысленными сообщениями
+Branches and Pull Requests
+main — main branch
 
-## Ветки и пул-реквесты
-
-- `main` — основная ветка
-- `feature/<название>` — новые фичи  
-
-Делать пул-реквест, когда фича полностью рабочая (с сервисами, логированием и тестами)
+feature/<name> — new features
