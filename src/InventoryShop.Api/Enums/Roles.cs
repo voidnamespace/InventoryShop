@@ -2,6 +2,6 @@ namespace IS.Enums;
 
 public enum Roles
 {
-    User,
+    Customer,
     Admin
 }
