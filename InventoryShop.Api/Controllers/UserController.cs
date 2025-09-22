@@ -26,7 +26,7 @@ public class UserController : ControllerBase
 
 
 
-    [HttpGet]
+    [HttpGet("{id}")]
     public async Task <ActionResult> GetById(Guid id)
     {
         var readUserDTO = await _userService.GetById(id);
@@ -35,10 +35,11 @@ public class UserController : ControllerBase
 
 
     [HttpPost]
-    public async Task<ActionResult<PostUserDTO>> Post (PostUserDTO postUserDTO)
+    public async Task<ActionResult<ReadUserDTO>> Post (PostUserDTO postUserDTO)
     {
         var post = await _userService.PostAsync(postUserDTO);
-        return Ok(post);
+        return CreatedAtAction(nameof(GetById), new { id = post.Id }, post);
+
     }
 
 

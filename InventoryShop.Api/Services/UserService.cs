@@ -60,7 +60,34 @@ public class UserService
 
     }
 
+    public async Task <ReadUserDTO> PostAsync (PostUserDTO postUserDTO)
+    {
+        if (postUserDTO == null)
+            throw new ArgumentNullException("User can not be null");
 
+        _logger.LogInformation("Request to post new user");
+
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            UserName = postUserDTO.UserName,
+            Email = postUserDTO.Email,
+            Password = postUserDTO.Password
+        };
+        await _context.AddAsync(user);
+
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation("User created with id {userID}", user.Id);
+
+        var readUserDTO = new ReadUserDTO
+        {
+           Id = user.Id, 
+           UserName = user.UserName,
+           Email = user.Email,
+        };
+        return readUserDTO;
+    }
 
 
 
