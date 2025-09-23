@@ -1,4 +1,5 @@
 namespace IS.UserService;
+using IS.PasswordService;
 using IS.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using IS.DbContext;
@@ -10,11 +11,13 @@ public class UserService
 {
     private readonly AppDbContext _context;
     private readonly ILogger<UserService> _logger;
+    private readonly PasswordService _passwordService;
 
-    public UserService (AppDbContext context, ILogger<UserService> logger)
+    public UserService (AppDbContext context, ILogger<UserService> logger, PasswordService passwordService)
     {
         _context = context;
         _logger = logger;
+        _passwordService = passwordService;
     }
 
     
@@ -24,8 +27,8 @@ public class UserService
 
         var users = await _context.Users.ToListAsync();
 
-        if (users == null)
-            _logger.LogWarning("Users not found");
+        if (!users.Any())
+            _logger.LogInformation("Users not found");
 
         var usersToDTO = users.Select(x => new ReadUserDTO
         {
@@ -66,14 +69,17 @@ public class UserService
             throw new ArgumentNullException("User can not be null");
 
         _logger.LogInformation("Request to post new user");
+        
 
         var user = new User
         {
             Id = Guid.NewGuid(),
             UserName = postUserDTO.UserName,
-            Email = postUserDTO.Email,
-            Password = postUserDTO.Password
+            Email = postUserDTO.Email
+            
         };
+        var password = postUserDTO.Password;
+        user.PasswordHash = _passwordService.HashPassword(user, password);
         await _context.AddAsync(user);
 
         await _context.SaveChangesAsync();
@@ -89,7 +95,24 @@ public class UserService
         return readUserDTO;
     }
 
+    public async Task<bool> DeleteAsync (Guid id)
+    {
+        var delUser = await _context.Users.FindAsync(id);
 
+        if (delUser == null)
+        {
+            _logger.LogWarning("Request to delete non-existing user with id {userId}", id);
+            throw new KeyNotFoundException($"User with id {id} not found");
+        }
+
+        _logger.LogInformation("Request to delete user with id {userId}", id);
+
+        _context.Users.Remove(delUser);
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation("User with id {userId} has been deleted", id);
+        return true;
+    }
 
 
 

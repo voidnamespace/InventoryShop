@@ -21,6 +21,8 @@ public class UserController : ControllerBase
     public async Task<ActionResult> GetAll()
     {
         var allReadUserDTO = await _userService.GetAllAsync();
+        if (allReadUserDTO == null) 
+            return NotFound("Users not found");
         return Ok(allReadUserDTO);  
     }
 
