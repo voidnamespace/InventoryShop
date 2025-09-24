@@ -1,5 +1,5 @@
 namespace IS.UserService;
-using IS.PasswordService;
+
 using IS.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using IS.DbContext;
@@ -11,13 +11,13 @@ public class UserService
 {
     private readonly AppDbContext _context;
     private readonly ILogger<UserService> _logger;
-    private readonly PasswordService _passwordService;
+    
 
-    public UserService (AppDbContext context, ILogger<UserService> logger, PasswordService passwordService)
+    public UserService (AppDbContext context, ILogger<UserService> logger)
     {
         _context = context;
         _logger = logger;
-        _passwordService = passwordService;
+       
     }
 
     
@@ -78,8 +78,7 @@ public class UserService
             Email = postUserDTO.Email
             
         };
-        var password = postUserDTO.Password;
-        user.PasswordHash = _passwordService.HashPassword(user, password);
+        
         await _context.AddAsync(user);
 
         await _context.SaveChangesAsync();
@@ -113,9 +112,6 @@ public class UserService
         _logger.LogInformation("User with id {userId} has been deleted", id);
         return true;
     }
-
-
-
 
 
 
