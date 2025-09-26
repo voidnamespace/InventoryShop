@@ -1,7 +1,6 @@
 ﻿using IS.DbContext;
 using IS.Entities;
 using IS.Services;
-using IS.Controller;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -10,24 +9,24 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ====== Add DbContext ======
+// ===== DbContext =====
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+Console.WriteLine("JWT Key from config: " + builder.Configuration["JWT:Key"]);
 
-// ====== Add Services ======
-builder.Services.AddScoped<AuthService>();
+
+// ===== Services =====
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<PasswordService>();
-
-// Регистрация IPasswordHasher<User>
-builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-
 builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddScoped<AuthService>();
 
-// ====== Add Controllers ======
+
+// ===== Controllers =====
 builder.Services.AddControllers();
 
-// ====== JWT Configuration ======
+// ===== JWT Authentication =====
 var jwtKey = builder.Configuration["JWT:Key"];
 var jwtIssuer = builder.Configuration["JWT:Issuer"];
 var jwtAudience = builder.Configuration["JWT:Audience"];
@@ -53,21 +52,19 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// ====== Add Authorization ======
 builder.Services.AddAuthorization();
 
-// ====== Swagger ======
+// ===== Swagger =====
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new() { Title = "InventoryShop API", Version = "v1" });
-
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Description = "Введите 'Bearer {token}'",
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
         Name = "Authorization",
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
     });
 
     c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
@@ -81,14 +78,15 @@ builder.Services.AddSwaggerGen(c =>
                     Id = "Bearer"
                 }
             },
-            Array.Empty<string>()
+            new string[] {}
         }
     });
 });
 
+
 var app = builder.Build();
 
-// ====== Middleware ======
+// ===== Middleware =====
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -97,8 +95,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication(); 
-app.UseAuthorization();  
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

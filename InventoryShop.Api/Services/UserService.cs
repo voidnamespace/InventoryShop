@@ -32,8 +32,9 @@ public class UserService
 
         var usersToDTO = users.Select(x => new ReadUserDTO
         {
+            Id = x.Id,
             UserName = x.UserName,
-            Email = x.Email,
+            Email = x.Email
         }).ToList();
 
         return usersToDTO;
@@ -55,6 +56,7 @@ public class UserService
 
         var readUserDTO = new ReadUserDTO
         {
+            Id = user.Id,
             UserName = user.UserName,
             Email = user.Email
         };

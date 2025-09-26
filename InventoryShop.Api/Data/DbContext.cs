@@ -13,23 +13,23 @@ public class AppDbContext : DbContext
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
 
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>()
-            .HasMany(c => c.Orders)
-            .WithOne(c => c.User)
-            .HasForeignKey(c => c.User.Id);
+            .HasMany(u => u.Orders)
+            .WithOne(o => o.User)
+            .HasForeignKey(o => o.UserId);
 
         modelBuilder.Entity<Order>()
-            .HasMany(c => c.OrderItems)
-            .WithOne(c => c.Order)
-            .HasForeignKey(c => c.OrderId);
+            .HasMany(o => o.OrderItems)
+            .WithOne(oi => oi.Order)
+            .HasForeignKey(oi => oi.OrderId);
 
         modelBuilder.Entity<OrderItem>()
-            .HasOne(c => c.Product)
+            .HasOne(oi => oi.Product)
             .WithMany()
-            .HasForeignKey(c => c.ProductId);
+            .HasForeignKey(oi => oi.ProductId);
 
         base.OnModelCreating(modelBuilder);
     }
