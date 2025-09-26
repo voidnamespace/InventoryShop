@@ -1,4 +1,4 @@
-﻿namespace InventoryShop.Api.Controllers;
+﻿namespace IS.Controller;
 
 using IS.DTOs;
 using IS.Services;

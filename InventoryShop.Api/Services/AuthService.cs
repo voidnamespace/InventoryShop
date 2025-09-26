@@ -11,12 +11,12 @@ public class AuthService
 {
     private readonly AppDbContext _context;
     private readonly PasswordService _hasher;
-    private readonly ILogger _logger;
+    private readonly ILogger<AuthService> _logger;
     private readonly TokenService _token;
 
 
 
-    public AuthService (AppDbContext context, PasswordService hasher, ILogger logger, TokenService token)
+    public AuthService (AppDbContext context, PasswordService hasher, ILogger<AuthService> logger, TokenService token)
     {
         _context = context;
         _hasher = hasher;
