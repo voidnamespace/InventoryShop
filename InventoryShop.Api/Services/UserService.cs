@@ -1,5 +1,4 @@
-namespace IS.UserService;
-
+namespace IS.Services;
 using IS.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using IS.DbContext;
@@ -11,13 +10,14 @@ public class UserService
 {
     private readonly AppDbContext _context;
     private readonly ILogger<UserService> _logger;
+    private readonly PasswordService _passwordService;
     
 
-    public UserService (AppDbContext context, ILogger<UserService> logger)
+    public UserService (AppDbContext context, ILogger<UserService> logger, PasswordService passwordService)
     {
         _context = context;
         _logger = logger;
-       
+       _passwordService = passwordService;
     }
 
     
@@ -75,10 +75,11 @@ public class UserService
         {
             Id = Guid.NewGuid(),
             UserName = postUserDTO.UserName,
-            Email = postUserDTO.Email
-            
+            Email = postUserDTO.Email          
         };
-        
+
+        user.PasswordHash = _passwordService.HashPassword(user, postUserDTO.Password);
+
         await _context.AddAsync(user);
 
         await _context.SaveChangesAsync();
@@ -112,8 +113,38 @@ public class UserService
         _logger.LogInformation("User with id {userId} has been deleted", id);
         return true;
     }
-    
 
+    public async Task<ReadUserDTO> RegisterAsync (PostUserDTO postUserDTO)
+    {
+        if (postUserDTO == null)
+            throw new ArgumentNullException("User can not be null");
+
+        _logger.LogInformation("Request to post new user");
+
+
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            UserName = postUserDTO.UserName,
+            Email = postUserDTO.Email
+        };
+
+        user.PasswordHash = _passwordService.HashPassword(user, postUserDTO.Password);
+
+        await _context.AddAsync(user);
+
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation("User created with id {userID}", user.Id);
+
+        var readUserDTO = new ReadUserDTO
+        {
+            Id = user.Id,
+            UserName = user.UserName,
+            Email = user.Email,
+        };
+        return readUserDTO;
+    }
 
 
 }

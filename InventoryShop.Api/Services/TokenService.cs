@@ -1,35 +1,38 @@
-﻿using System.Security.Claims;
+﻿namespace IS.Services;
 using IS.Entities;
+using IS.Enums;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
-namespace InventoryShop.Api.Services;
 
 public class TokenService
 {
-    private readonly string _secretKey;
+    private readonly string _key;
     private readonly string _issuer;
     private readonly string _audience;
 
-
     public TokenService(IConfiguration config)
     {
-        _secretKey = config["JWT: Key"] ?? throw new ArgumentNullException("JWT key is missing");
-        _issuer = config["JWT: Issuer"] ?? throw new ArgumentNullException("JWT Issuer is missing");
-        _audience = config["JWT: Audience"] ?? throw new ArgumentNullException("JWT Audience is missing");
+        _key = config["Jwt: Key"] ?? throw new ArgumentNullException("JWT: Key is missing");
+        _issuer = config["Jwt: Issuer"] ?? throw new ArgumentNullException("JWT: Issuer is missing");
+        _audience = config["Jwt: Audience"] ?? throw new ArgumentNullException("JWT: Audience is missing");
     }
 
     public string GenerateToken(User user)
     {
-        var claims = new Claim[]
+        var claims = new[]
         {
             new Claim("id", user.Id.ToString()),
             new Claim("role", user.Role.ToString())
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key));
+
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
@@ -40,11 +43,15 @@ public class TokenService
             Audience = _audience
         };
 
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var token = tokenHandler.CreateToken(tokenDescriptor);
+        var tokenHanlder = new JwtSecurityTokenHandler();
+        var token = tokenHanlder.CreateToken(tokenDescriptor);
 
-        return tokenHandler.WriteToken(token);
+        return tokenHanlder.WriteToken(token);
+
 
     }
+
+
+
 
 }
