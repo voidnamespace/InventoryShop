@@ -92,6 +92,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseMiddleware<IS.Middleware.ErrorHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
