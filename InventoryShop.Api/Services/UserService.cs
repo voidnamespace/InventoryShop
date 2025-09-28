@@ -68,7 +68,7 @@ public class UserService
     public async Task <ReadUserDTO> PostAsync (PostUserDTO postUserDTO)
     {
         if (postUserDTO == null)
-            throw new ArgumentNullException("User can not be null");
+            throw new ArgumentNullException("postUserDTO can not be null");
 
         _logger.LogInformation("Request to post new user");
         
@@ -96,6 +96,38 @@ public class UserService
         };
         return readUserDTO;
     }
+
+    public async Task<ReadUserDTO> PutAsync(Guid id, PutUserDTO putUserDTO)
+    {
+  
+        if (putUserDTO == null)
+            throw new ArgumentNullException("putUserDTO can not be null");
+
+        var currentUser = await _context.Users.FindAsync(id);
+        if (currentUser == null)
+            throw new KeyNotFoundException($"User with id {id} not found");
+
+        currentUser.UserName = putUserDTO.UserName ?? currentUser.UserName;
+        currentUser.Email = putUserDTO.Email ?? currentUser.Email;
+
+
+        if (!string.IsNullOrEmpty(putUserDTO.Password))
+        {
+            _passwordService.HashPassword(currentUser, putUserDTO.Password);
+        }
+
+        await _context.SaveChangesAsync();
+
+        var readUserDTO = new ReadUserDTO
+        {
+            Id = currentUser.Id,
+            UserName = currentUser.UserName,
+            Email = currentUser.Email,
+        };
+        return readUserDTO;
+
+    }
+
 
     public async Task<bool> DeleteAsync (Guid id)
     {
