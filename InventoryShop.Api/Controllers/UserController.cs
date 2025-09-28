@@ -37,6 +37,8 @@ public class UserController : ControllerBase
     [Route("post")]
     public async Task<ActionResult<ReadUserDTO>> Post (PostUserDTO postUserDTO)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
         var post = await _userService.PostAsync(postUserDTO);
         return CreatedAtAction(nameof(GetById), new { id = post.Id }, post);
     }
