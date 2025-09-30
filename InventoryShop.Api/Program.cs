@@ -92,11 +92,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseMiddleware<IS.Middleware.ErrorHandlingMiddleware>();
-
 app.UseHttpsRedirection();
 
+app.UseMiddleware<IS.Middleware.ErrorHandlingMiddleware>();
+
 app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllers();

@@ -41,7 +41,7 @@ public class UserService
 
     }
 
-    public async Task <ReadUserDTO> GetById (Guid id)
+    public async Task <ReadUserDTO?> GetById (Guid id)
     {
         _logger.LogInformation("Request to get user with {id}", id);
 
@@ -50,7 +50,7 @@ public class UserService
         if (user == null)
         {
             _logger.LogWarning("User with id {id} not found ", id);
-            throw new KeyNotFoundException("User not found");
+            return null;
         }
           
 
@@ -97,7 +97,7 @@ public class UserService
         return readUserDTO;
     }
 
-    public async Task<ReadUserDTO> PutAsync(Guid id, PutUserDTO putUserDTO)
+    public async Task<ReadUserDTO?> PutAsync(Guid id, PutUserDTO putUserDTO)
     {
   
         if (putUserDTO == null)
@@ -105,7 +105,7 @@ public class UserService
 
         var currentUser = await _context.Users.FindAsync(id);
         if (currentUser == null)
-            throw new KeyNotFoundException($"User with id {id} not found");
+            return null;
 
         currentUser.UserName = putUserDTO.UserName ?? currentUser.UserName;
         currentUser.Email = putUserDTO.Email ?? currentUser.Email;
@@ -113,8 +113,9 @@ public class UserService
 
         if (!string.IsNullOrEmpty(putUserDTO.Password))
         {
-            _passwordService.HashPassword(currentUser, putUserDTO.Password);
+            currentUser.PasswordHash = _passwordService.HashPassword(currentUser, putUserDTO.Password);
         }
+
 
         await _context.SaveChangesAsync();
 
@@ -136,7 +137,7 @@ public class UserService
         if (delUser == null)
         {
             _logger.LogWarning("Request to delete non-existing user with id {userId}", id);
-            throw new KeyNotFoundException($"User with id {id} not found");
+            return false;
         }
 
         _logger.LogInformation("Request to delete user with id {userId}", id);
@@ -148,10 +149,14 @@ public class UserService
         return true;
     }
 
-    public async Task<ReadUserDTO> RegisterAsync (PostUserDTO postUserDTO)
+    public async Task<ReadUserDTO?> RegisterAsync (PostUserDTO postUserDTO)
     {
         if (postUserDTO == null)
-            throw new ArgumentNullException("User can not be null");
+        {
+            _logger.LogWarning("postUserDTO can not be null");
+            return null;
+        }
+            
 
         _logger.LogInformation("Request to post new user");
 
