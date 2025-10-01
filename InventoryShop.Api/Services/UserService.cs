@@ -77,7 +77,8 @@ public class UserService
         {
             Id = Guid.NewGuid(),
             UserName = postUserDTO.UserName,
-            Email = postUserDTO.Email          
+            Email = postUserDTO.Email,   
+            Role = Enums.Roles.Customer
         };
 
         user.PasswordHash = _passwordService.HashPassword(user, postUserDTO.Password);
@@ -92,7 +93,7 @@ public class UserService
         {
            Id = user.Id, 
            UserName = user.UserName,
-           Email = user.Email,
+           Email = user.Email, 
         };
         return readUserDTO;
     }

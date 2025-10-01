@@ -34,7 +34,7 @@ public class UserController : ControllerBase
             return NotFound($"User with id {id} not found");
         return Ok(readUserDTO);
     }
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult<ReadUserDTO>> Post (PostUserDTO postUserDTO)
     {
@@ -65,5 +65,24 @@ public class UserController : ControllerBase
             return NotFound($"User with id {id} not found");
         return NoContent();
     }
+
+    [AllowAnonymous]
+    [HttpPost("register")]
+    public async Task<ActionResult<ReadUserDTO>> Register(PostUserDTO postUserDTO)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var user = await _userService.RegisterAsync(postUserDTO);
+        if (user == null)
+            return BadRequest("Registration failed");
+
+        return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+    }
+
+
+
+
+
 
 }
