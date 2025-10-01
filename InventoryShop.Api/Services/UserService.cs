@@ -71,6 +71,8 @@ public class UserService
             throw new ArgumentNullException("postUserDTO can not be null");
 
         _logger.LogInformation("Request to post new user");
+
+        var existingUser = await _context.Users.FirstOrDefaultAsync(x => x.Email == postUserDTO.Email);
         
 
         var user = new User
@@ -153,14 +155,16 @@ public class UserService
     public async Task<ReadUserDTO?> RegisterAsync (PostUserDTO postUserDTO)
     {
         if (postUserDTO == null)
+            throw new ArgumentNullException(nameof(postUserDTO));
+
+
+        _logger.LogInformation("Request to register new user with email {Email}", postUserDTO.Email);
+
+        bool emailExists = await _context.Users.AnyAsync(u => u.Email == postUserDTO.Email);
+        if (emailExists)
         {
-            _logger.LogWarning("postUserDTO can not be null");
-            return null;
+            throw new ArgumentException("User with this email already exists");
         }
-            
-
-        _logger.LogInformation("Request to post new user");
-
 
         var user = new User
         {
