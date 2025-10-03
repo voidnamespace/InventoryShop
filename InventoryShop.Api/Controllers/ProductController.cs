@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
-
+[Route("api/[controller]")]
 [ApiController]
 public class ProductController : ControllerBase
 {
@@ -20,7 +20,7 @@ public class ProductController : ControllerBase
 
 
     [Authorize]
-    [HttpGet("products")]
+    [HttpGet]
 
     public async Task<ActionResult<List<ReadProductDTO>>> GetProducts()
     {

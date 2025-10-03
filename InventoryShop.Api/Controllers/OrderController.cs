@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
+[Route("api/[controller]")]
 [ApiController]
 public class OrderController : ControllerBase
 {
@@ -20,16 +21,41 @@ public class OrderController : ControllerBase
 
 
     [Authorize]
-    [HttpPost("order")]
-    public async Task<ActionResult<Order>> CreateOrder([FromBody] CreateOrderDTO dto)
+    [HttpPost]
+    public async Task<ActionResult<ReadOrderDTO>> MakeOrder([FromBody] CreateOrderDTO createOrderDTO)
     {
-        var userId = Guid.Parse(User.FindFirst("id")!.Value);
+        var userIdClaim = User.FindFirst("id")?.Value;
+        if (userIdClaim == null) return Unauthorized();
+        var userId = Guid.Parse(userIdClaim);
 
-        var order = await _orderService.MakeOrderAsync(userId, dto);
+
+        var order = await _orderService.MakeOrderAsync(userId, createOrderDTO);
         return Ok(order);
     }
 
 
+    [Authorize]
+    [HttpGet("my-orders")]
+    public async Task<ActionResult<List<ReadOrderDTO>>> GetAllOrdersAsCustomer()
+    {
+        var userIdClaim = User.FindFirst("id")?.Value;
+        if (userIdClaim == null) return Unauthorized();
+        var userId = Guid.Parse(userIdClaim);
+
+        var orders = await _orderService.GetAllOrdersAsCustomerAsync(userId);
+        return Ok(orders);
+    }
+
+
+
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("user/{userId}/orders")]
+    public async Task<ActionResult<List<ReadOrderDTO>>> GetAllOrdersAsAdmin(Guid userId)
+    {
+        var orders = await _orderService.GetAllOrdersAsAdminAsync(userId);
+        return Ok(orders);
+    }
 
 
 
