@@ -41,7 +41,7 @@ public class UserService
 
     }
 
-    public async Task <ReadUserDTO> GetById (Guid id)
+    public async Task <ReadUserDTO?> GetById (Guid id)
     {
         _logger.LogInformation("Request to get user with {id}", id);
 
@@ -50,7 +50,7 @@ public class UserService
         if (user == null)
         {
             _logger.LogWarning("User with id {id} not found ", id);
-            throw new KeyNotFoundException("User not found");
+            return null;
         }
           
 
@@ -71,13 +71,16 @@ public class UserService
             throw new ArgumentNullException("postUserDTO can not be null");
 
         _logger.LogInformation("Request to post new user");
+
+        var existingUser = await _context.Users.FirstOrDefaultAsync(x => x.Email == postUserDTO.Email);
         
 
         var user = new User
         {
             Id = Guid.NewGuid(),
             UserName = postUserDTO.UserName,
-            Email = postUserDTO.Email          
+            Email = postUserDTO.Email,   
+            Role = Enums.Roles.Customer
         };
 
         user.PasswordHash = _passwordService.HashPassword(user, postUserDTO.Password);
@@ -92,12 +95,12 @@ public class UserService
         {
            Id = user.Id, 
            UserName = user.UserName,
-           Email = user.Email,
+           Email = user.Email, 
         };
         return readUserDTO;
     }
 
-    public async Task<ReadUserDTO> PutAsync(Guid id, PutUserDTO putUserDTO)
+    public async Task<ReadUserDTO?> PutAsync(Guid id, PutUserDTO putUserDTO)
     {
   
         if (putUserDTO == null)
@@ -105,7 +108,7 @@ public class UserService
 
         var currentUser = await _context.Users.FindAsync(id);
         if (currentUser == null)
-            throw new KeyNotFoundException($"User with id {id} not found");
+            return null;
 
         currentUser.UserName = putUserDTO.UserName ?? currentUser.UserName;
         currentUser.Email = putUserDTO.Email ?? currentUser.Email;
@@ -113,8 +116,9 @@ public class UserService
 
         if (!string.IsNullOrEmpty(putUserDTO.Password))
         {
-            _passwordService.HashPassword(currentUser, putUserDTO.Password);
+            currentUser.PasswordHash = _passwordService.HashPassword(currentUser, putUserDTO.Password);
         }
+
 
         await _context.SaveChangesAsync();
 
@@ -136,7 +140,7 @@ public class UserService
         if (delUser == null)
         {
             _logger.LogWarning("Request to delete non-existing user with id {userId}", id);
-            throw new KeyNotFoundException($"User with id {id} not found");
+            return false;
         }
 
         _logger.LogInformation("Request to delete user with id {userId}", id);
@@ -148,13 +152,19 @@ public class UserService
         return true;
     }
 
-    public async Task<ReadUserDTO> RegisterAsync (PostUserDTO postUserDTO)
+    public async Task<ReadUserDTO?> RegisterAsync (PostUserDTO postUserDTO)
     {
         if (postUserDTO == null)
-            throw new ArgumentNullException("User can not be null");
+            throw new ArgumentNullException(nameof(postUserDTO));
 
-        _logger.LogInformation("Request to post new user");
 
+        _logger.LogInformation("Request to register new user with email {Email}", postUserDTO.Email);
+
+        bool emailExists = await _context.Users.AnyAsync(u => u.Email == postUserDTO.Email);
+        if (emailExists)
+        {
+            throw new ArgumentException("User with this email already exists");
+        }
 
         var user = new User
         {
