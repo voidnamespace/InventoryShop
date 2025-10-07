@@ -128,9 +128,49 @@ public class OrderService
         return readOrders;
     }
 
-    public async Task<ReadOrderDTO> GetOrderByIdAsCustomerAsync()
+    public async Task<ReadOrderDTO> GetOrderByIdAsCustomerAsync(Guid userId, Guid orderId)
     {
+        _logger.LogInformation("Request to get order {orderId} for user {userId}", orderId, userId);
         
+        var user = await _context.Users
+            .Include(x => x.Orders)
+            .ThenInclude(y => y.OrderItems)
+            .ThenInclude(z => z.Product)
+            .FirstOrDefaultAsync(p => p.Id == userId);
+
+        if (user == null)
+        {
+            _logger.LogWarning("User with id {id} not found", userId);
+            throw new KeyNotFoundException($"User {userId} not found");
+        }
+            
+        var neededOrder = user.Orders.FirstOrDefault(x => x.Id == orderId);
+        if (neededOrder == null)
+        {
+            _logger.LogWarning("Order {orderId} for user {userId} not found", orderId, userId);
+            throw new KeyNotFoundException($"Order {orderId} not found for user {userId}");
+        }
+            
+
+        var readOrderDTO = new ReadOrderDTO
+        {
+            Id = neededOrder.Id,
+            DateCreated = neededOrder.DateCreated,
+            TotalAmount = neededOrder.TotalAmount,
+            UserId = user.Id,
+            UserName = user.UserName,
+            Items = neededOrder.OrderItems.Select(oi => new ReadOrderItemDTO
+            {
+                ProductId = oi.ProductId,
+                ProductName = oi.Product.Name,
+                Quantity = oi.Quantity,
+                UnitPrice = oi.UnitPrice,
+
+            }).ToList()
+        };
+        _logger.LogInformation("Successfully retrieved order {orderId} for user {userId}", orderId, userId);
+
+        return readOrderDTO;
 
     }
     
