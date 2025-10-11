@@ -55,7 +55,6 @@ public class UserController : ControllerBase
         return Ok(put);
     }
 
-
     [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete (Guid id)
@@ -79,10 +78,4 @@ public class UserController : ControllerBase
 
         return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
     }
-
-
-
-
-
-
 }

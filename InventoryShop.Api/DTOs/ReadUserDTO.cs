@@ -2,7 +2,6 @@ namespace IS.DTOs;
 using Microsoft.AspNetCore.Identity;
 using IS.Enums;
 
-
 public class ReadUserDTO
 {
     public Guid Id { get; set; }

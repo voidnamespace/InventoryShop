@@ -1,5 +1,4 @@
 ﻿namespace IS.Services;
-
 using IS.DTOs;
 using IS.DbContext;
 using IS.Entities;
@@ -13,8 +12,6 @@ public class AuthService
     private readonly ILogger<AuthService> _logger;
     private readonly TokenService _token;
 
-
-
     public AuthService (AppDbContext context, PasswordService hasher, ILogger<AuthService> logger, TokenService token)
     {
         _context = context;
@@ -22,8 +19,6 @@ public class AuthService
         _logger = logger;
         _token = token;
     }
-
-
     public async Task<LoginResponseDTO?> LoginAsync (string email, string password)
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
@@ -53,8 +48,6 @@ public class AuthService
         };
 
     }
-
-
     public async Task<ReadUserDTO> RegisterAsync (string username, string email, string password)
     {
         if (await _context.Users.AnyAsync(u => u.Email == email))
@@ -62,7 +55,6 @@ public class AuthService
 
         if (await _context.Users.AnyAsync(u => u.UserName == username))
             throw new ArgumentException("Username already exists");
-
 
         _logger.LogInformation("Request to create new user");
 
@@ -89,13 +81,4 @@ public class AuthService
             Email = newUser.Email,
         };
     }
-
-
-
-
-
-
-
-
-
 }

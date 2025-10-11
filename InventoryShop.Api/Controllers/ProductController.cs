@@ -1,11 +1,9 @@
 ﻿namespace IS.Controller;
-
 using IS.DTOs;
 using IS.Entities;
 using IS.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
 
 [Route("api/[controller]")]
 [ApiController]
@@ -18,7 +16,6 @@ public class ProductController : ControllerBase
         _productService = productService;
     }
 
-
     [Authorize]
     [HttpGet]
 
@@ -30,12 +27,10 @@ public class ProductController : ControllerBase
             return NotFound("Products not found");
 
         return Ok(list);
-
     }
 
     [Authorize]
     [HttpGet("{id}")]
- 
     public async Task<ActionResult> GetProduct(Guid id)
     {
         var prod = await _productService.GetProductAsync(id);
@@ -43,7 +38,8 @@ public class ProductController : ControllerBase
             return NotFound("No such product");
         return Ok(prod);
     }
-    [Authorize(Roles = "admin")]
+
+    [Authorize(Roles = "Admin")]
     [HttpPost("post")]
     public async Task<ActionResult<ReadProductDTO>> PostProduct (PostProductDTO postProductDTO)
     {
@@ -54,8 +50,6 @@ public class ProductController : ControllerBase
         return CreatedAtAction(nameof(GetProduct), new { id = post.Id }, post);
     }
 
-
-
     [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteProduct(Guid id)
@@ -65,9 +59,4 @@ public class ProductController : ControllerBase
             return BadRequest("No such product to delete");
         return NoContent();
     }
-
-
-
-
 }
-

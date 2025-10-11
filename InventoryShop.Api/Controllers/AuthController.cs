@@ -1,5 +1,4 @@
 ﻿namespace IS.Controller;
-
 using IS.DTOs;
 using IS.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -15,7 +14,6 @@ public class AuthController : ControllerBase
     {
         _authService = authService;
     }
-
 
     [HttpPost("register")]
     [AllowAnonymous]
@@ -36,6 +34,4 @@ public class AuthController : ControllerBase
 
         return Ok(result);
     }
-
-
 }

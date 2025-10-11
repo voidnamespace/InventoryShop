@@ -10,8 +10,6 @@ public class OrderService
 {
     private readonly ILogger<OrderService> _logger;
     private readonly AppDbContext _context;
-
-
     public OrderService (AppDbContext context, ILogger<OrderService> logger)
     {
         _context = context;
@@ -89,8 +87,6 @@ public class OrderService
 
         return readOrderDTO;
     }
-
-
     public async Task<List<ReadOrderDTO>> GetAllOrdersAsCustomerAsync(Guid userId)
     {
 
@@ -182,7 +178,6 @@ public class OrderService
             .ThenInclude(y => y.Product)
         .FirstOrDefaultAsync(z => z.Id == userId);
 
-
         if (user == null)
             throw new KeyNotFoundException($"No such user {userId}");
 
@@ -206,17 +201,5 @@ public class OrderService
         }).ToList();
 
         return readOrders;
-
-
     }
-
-
-
-
-
-
-
-
-
-
 }
