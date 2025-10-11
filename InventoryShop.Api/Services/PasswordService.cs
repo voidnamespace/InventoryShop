@@ -8,8 +8,6 @@ public class PasswordService
 {
     private readonly IPasswordHasher<User> _passwordHasher;
     private readonly AppDbContext _context;
-
-
     public PasswordService(IPasswordHasher<User> passwordHasher, AppDbContext context)
     {
         _passwordHasher = passwordHasher;
@@ -39,9 +37,6 @@ public class PasswordService
 
         return false;
     }
-
-
-
     public bool VerifyPasswordAndUpdateHash(User user, string providedPassword)
     {
         var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, providedPassword);

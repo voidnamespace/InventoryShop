@@ -1,5 +1,4 @@
 ﻿namespace IS.Services;
-
 using IS.DTOs;
 using IS.DbContext;
 using IS.Entities;
@@ -17,8 +16,6 @@ public class ProductService
         _context = context;
 
     }
-
-
     public async Task<List<ReadProductDTO>> GetProductsAsync()
     {
         _logger.LogInformation("Request to get all products");
@@ -65,8 +62,6 @@ public class ProductService
         return readProductDTO;
     }
 
-
-
     public async Task<ReadProductDTO> PostProductAsync(PostProductDTO postProductDTO)
     {
         if (postProductDTO == null)
@@ -102,8 +97,7 @@ public class ProductService
         {
             _logger.LogWarning("Product with id {id} not found", id);
             return false;
-        }
-            
+        }         
 
         _logger.LogInformation("Request to delete product with Id {id}", id);
 
@@ -116,7 +110,4 @@ public class ProductService
         return true;
     }
 
-
-
 }
-

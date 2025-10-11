@@ -5,7 +5,6 @@ using IS.DbContext;
 using IS.Entities;
 using Microsoft.EntityFrameworkCore;
 
-
 public class UserService 
 {
     private readonly AppDbContext _context;
@@ -189,6 +188,5 @@ public class UserService
         };
         return readUserDTO;
     }
-
 
 }

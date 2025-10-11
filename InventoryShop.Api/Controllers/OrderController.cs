@@ -15,11 +15,6 @@ public class OrderController : ControllerBase
         _orderService = orderService;
     }
 
-
-
-
-
-
     [Authorize]
     [HttpPost]
     public async Task<ActionResult<ReadOrderDTO>> MakeOrder([FromBody] CreateOrderDTO createOrderDTO)
@@ -33,7 +28,6 @@ public class OrderController : ControllerBase
         return Ok(order);
     }
 
-
     [Authorize]
     [HttpGet("my-orders")]
     public async Task<ActionResult<List<ReadOrderDTO>>> GetAllOrdersAsCustomer()
@@ -46,8 +40,16 @@ public class OrderController : ControllerBase
         return Ok(orders);
     }
 
-
-
+    [Authorize]
+    [HttpGet("my-orders/{id}")]
+    public async Task<ActionResult<ReadOrderDTO>> GetOrderByIdAsCustomer(Guid orderId)
+    {
+        var userIdClaim = User.FindFirst("id")?.Value;
+        if (userIdClaim == null) return Unauthorized();
+        var userId = Guid.Parse(userIdClaim);
+        var neededOrder = await _orderService.GetOrderByIdAsCustomerAsync(userId, orderId);
+        return Ok(neededOrder);
+    } 
 
     [Authorize(Roles = "Admin")]
     [HttpGet("user/{userId}/orders")]
@@ -56,8 +58,4 @@ public class OrderController : ControllerBase
         var orders = await _orderService.GetAllOrdersAsAdminAsync(userId);
         return Ok(orders);
     }
-
-
-
-
 }

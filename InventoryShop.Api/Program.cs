@@ -9,24 +9,21 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ===== DbContext =====
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 Console.WriteLine("JWT Key from config: " + builder.Configuration["JWT:Key"]);
 
 
-// ===== Services =====
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<PasswordService>();
 builder.Services.AddScoped<TokenService>();
-builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
 
-// ===== Controllers =====
 builder.Services.AddControllers();
 
-// ===== JWT Authentication =====
 var jwtKey = builder.Configuration["JWT:Key"];
 var jwtIssuer = builder.Configuration["JWT:Issuer"];
 var jwtAudience = builder.Configuration["JWT:Audience"];
@@ -54,7 +51,6 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// ===== Swagger =====
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -86,7 +82,6 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// ===== Middleware =====
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
